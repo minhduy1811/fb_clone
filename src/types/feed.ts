@@ -3,6 +3,7 @@ export interface Post {
     authorId: string;
     authorName: string;
     authorAvatar: string;
+    authorMail: string;
     content: string;
     imageUrls: string[];
     likes: string[];

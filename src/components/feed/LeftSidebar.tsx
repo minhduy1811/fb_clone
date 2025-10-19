@@ -1,6 +1,5 @@
 import { Users, Clock, Bookmark, UsersRound, Store, Tv } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getCurrentUser } from '@/lib/mockApiFeed';
 import { useAuth } from '@/hooks/useAuth';
 
 

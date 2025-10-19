@@ -8,14 +8,13 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+// import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { LoginFormData } from '@/types/auth';
 import { useRouter } from 'next/navigation';
 import { auth, db } from '@/lib/firebase.config';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import Cookies from "js-cookie";
 
 const loginSchema = z.object({
     email: z.string().email('Email không hợp lệ'),
@@ -25,10 +24,9 @@ const loginSchema = z.object({
 
 interface LoginFormProps {
     defaultEmail?: string;
-    defaultPassword?: string;
 }
 
-export default function LoginForm({ defaultEmail, defaultPassword }: LoginFormProps) {
+export default function LoginForm({ defaultEmail }: LoginFormProps) {
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
@@ -36,18 +34,16 @@ export default function LoginForm({ defaultEmail, defaultPassword }: LoginFormPr
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-        setValue,
         watch,
     } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
             email: defaultEmail || '',
-            password: defaultPassword || '',
-            rememberMe: false,
+            // rememberMe: false,
         },
     });
 
-    const rememberMe = watch('rememberMe');
+    // const rememberMe = watch('rememberMe');
 
     const onSubmit = async (data: LoginFormData) => {
         try {
@@ -69,17 +65,22 @@ export default function LoginForm({ defaultEmail, defaultPassword }: LoginFormPr
                 return;
             }
 
-            const userData = userDoc.data();
-            const role = userData.role || 'user';
-            const token = await user.getIdToken();
+            const { role = 'user ' } = userDoc.data();
+            const idToken = await user.getIdToken();
 
             // ✅ Lưu cookie cho SSR
-            await fetch("/api/login", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token }),
+                body: JSON.stringify({ idToken }),
+                credentials: "include", // ✅ để browser lưu cookie
             });
-
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                toast.error('Đăng nhập thất bại: ' + (body.error || res.statusText));
+                await signOut(auth);
+                return;
+            }
             toast.success("Đăng nhập thành công!");
 
             // 🔐 Điều hướng theo role
@@ -147,7 +148,7 @@ export default function LoginForm({ defaultEmail, defaultPassword }: LoginFormPr
                 )}
             </div>
 
-            <div className="flex items-center space-x-2">
+            {/* <div className="flex items-center space-x-2">
                 <Checkbox
                     id="rememberMe"
                     checked={rememberMe}
@@ -156,23 +157,23 @@ export default function LoginForm({ defaultEmail, defaultPassword }: LoginFormPr
                 <label htmlFor="rememberMe" className="text-sm font-medium">
                     Ghi nhớ đăng nhập
                 </label>
-            </div>
+            </div> */}
 
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer" disabled={isSubmitting}>
                 {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </Button>
 
-            <div className="text-center">
+            {/* <div className="text-center">
                 <a href="#" className="text-sm text-blue-600 hover:text-blue-700">
                     Quên mật khẩu?
                 </a>
-            </div>
+            </div> */}
 
             <div className="text-center pt-4 border-t">
                 <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full  cursor-pointer"
                     onClick={() => router.push('/auth/signup')}
                 >
                     Tạo tài khoản mới

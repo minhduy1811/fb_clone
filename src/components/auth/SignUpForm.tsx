@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+// import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,18 +11,20 @@ import { toast } from 'sonner'
 import { auth } from '@/lib/firebase.config';
 import { SignUpFormData } from '@/types/auth';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, getAuth } from 'firebase/auth';
+import api from '@/lib/api';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
+import { signUpSchema } from '@/lib/signupSchema';
 
-const signUpSchema = z.object({
-    name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự'),
-    dateOfBirth: z.string().min(1, 'Vui lòng chọn ngày sinh'),
-    gender: z.enum(['male', 'female', 'other'], {
-        required_error: 'Vui lòng chọn giới tính',
-    }),
-    email: z.string().email('Email không hợp lệ'),
-    password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-});
-
+// const form = useForm<SignUpFormData>({
+//     resolver: zodResolver(signUpSchema),
+//     defaultValues: {
+//         name: "",
+//         email: "",
+//         password: "",
+//         gender: "male",
+//         dateOfBirth: "",
+//     },
+// });
 export const SignUpForm = () => {
     const router = useRouter();
 
@@ -51,17 +53,16 @@ export const SignUpForm = () => {
                 throw new Error('NEXT_PUBLIC_API_URL không được định nghĩa trong file .env');
             }
             // Gửi thông tin sang NestJS
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}`, },
-                body: JSON.stringify({
-                    uid: data.uid, email: data.email, displayName: data.name, gender: data.gender, // Thêm giới tính
-                    birthdate: data.dateOfBirth, role: data.role,
-                }),
+            const response = await api.post("/auth/signup", {
+                idToken, // gửi kèm để backend xác minh uid
+                email: data.email,
+                displayName: data.name,
+                gender: data.gender,
+                birthdate: data.dateOfBirth,
+                role: data.role,
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Đăng ký thất bại khi gửi thông tin đến API.');
+            if (response.status !== 201) {
+                throw new Error('Đăng ký thất bại trên server. Vui lòng thử lại.');
             }
             // Cập nhật thông tin người dùng (tên và giới tính)
             await updateProfile(user, {
@@ -72,12 +73,12 @@ export const SignUpForm = () => {
             });
 
             // Hiển thị thông báo thành công
-            toast.success('Xác minh email', {
+            toast.success('Đăng ký thành công!', {
                 description: 'Email xác minh đã được gửi. Vui lòng kiểm tra hộp thư của bạn.',
             });
 
             // Chuyển hướng đến trang xác minh email
-            router.push("/auth/login");
+            router.push(`/auth/login?email=${encodeURIComponent(data.email)}`);
         } catch (error: any) {
             // Xử lý lỗi đăng ký
             console.error('Firebase Sign Up Error:', error.message);
@@ -165,7 +166,7 @@ export const SignUpForm = () => {
                 <Input
                     id="password"
                     type="password"
-                    placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
+                    placeholder="Nhập mật khẩu (ít nhất 8 ký tự)"
                     {...register('password')}
                     className={errors.password ? 'border-red-500' : ''}
                 />

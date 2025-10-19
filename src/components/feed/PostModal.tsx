@@ -52,8 +52,8 @@ export const PostModal = ({ post, open, onOpenChange }: PostModalProps) => {
     const displayTime = formatRelativeTime(createdAt);
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[120vh] overflow-hidden">
-                <DialogHeader>
+            <DialogContent className="max-w-xl max-h-[120vh] overflow-hidden">
+                <DialogHeader className='flex items-center'>
                     <DialogTitle>Bài viết của {post.authorName}</DialogTitle>
                 </DialogHeader>
 
@@ -74,15 +74,33 @@ export const PostModal = ({ post, open, onOpenChange }: PostModalProps) => {
 
                     </div>
                     <div className=' overflow-y-auto max-h-[65vh]'>
-                        <p className="text-base">{post.content}</p>
-                        {(post.imageUrls ?? []).map((url, i) => (
-                            <img key={i} src={url} alt={`image ${i}`} className="rounded-md object-cover" />
-                        ))}
-
-                        {/* {post.imageUrls.map((image, index) => (
-                            <img key={index} src={image} alt="Post image" className="max-h-[400px] max-w-[544px] object-contain" />
-                        ))} */}
-
+                        <p className="text-base white-pre-line mb-2">{post.content}</p>
+                        <div
+                            className={`grid gap-1 overflow-hidden rounded-lg
+                ${post.imageUrls.length === 1 ? "grid-cols-1" : ""}
+                ${post.imageUrls.length === 2 ? "grid-cols-2" : ""}
+                ${post.imageUrls.length === 3 ? "grid-cols-2 grid-rows-2" : ""}
+                ${post.imageUrls.length >= 4 ? "grid-cols-2" : ""}
+            `}
+                        >
+                            {post.imageUrls.slice(0, 4).map((image, index) => (
+                                <div
+                                    key={index}
+                                    className={`relative overflow-hidden${post.imageUrls.length === 3 && index === 0 ? "row-span-2" : ""}`}
+                                >
+                                    <img
+                                        src={image}
+                                        alt={`post-image-${index}`}
+                                        className={`w-full h-full object-cover${post.imageUrls.length === 1 ? "max-h-[600px] object-contain" : "aspect-square"}`}
+                                    />
+                                    {index === 3 && post.imageUrls.length > 4 && (
+                                        <div className="absolute inset-0 bg-black/50 text-white text-2xl font-semibold flex items-center justify-center">
+                                            +{post.imageUrls.length - 4}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                         <div className="border-t pt-4">
                             <h4 className="font-semibold mb-4">Bình luận</h4>
                             <CommentList comments={comments} />

@@ -7,12 +7,14 @@ import { LeftSidebar } from '@/components/feed/LeftSidebar';
 import { RightSidebar } from '@/components/feed/RightSidebar';
 import { PostForm } from '@/components/feed/PostForm';
 import { NewPostForm } from '@/components/feed/NewPostForm'
+import { PostEdit } from '@/components/feed/PostEdit';
 import { PostCard } from '@/components/feed/PostCard';
 import { PostModal } from '@/components/feed/PostModal';
 import { Post } from '@/types/feed';
-import { getAllPosts } from '@/lib/posts';
-import { onAuthStateChanged } from 'firebase/auth';
+import { getAllPosts } from '@/lib/apiPosts';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase.config';
+import { toast } from 'sonner';
 
 const Feed = () => {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -20,24 +22,39 @@ const Feed = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter();
     const [isNewPost, setIsPostOpen] = useState(false);
+    const [isEditPost, setIsEditPost] = useState(false);
     useEffect(() => {
+        let isMounted = true;
+
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (!isMounted) return;
+
             if (!user) {
-                router.push("/auth/login");
+                router.replace("/auth/login");
                 return;
             }
 
-            // ✅ Luôn refresh token mới nhất
-            const token = await user.getIdToken(true);
-            localStorage.setItem("token", token);
-
-            console.log("User hiện tại là: ", user);
-            // Gọi API hoặc load post sau khi có token hợp lệ
-            await loadPosts();
+            try {
+                await loadPosts();
+            } catch (err: any) {
+                console.error("❌ Lỗi loadPosts:", err);
+                if (err?.response?.status === 401) {
+                    await signOut(auth);
+                    toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+                }
+                router.replace("/auth/login");
+            }
         });
 
-        return () => unsubscribe();
+        return () => {
+            isMounted = false;
+            unsubscribe();
+        };
+        // ⚠️ auth là singleton (import cố định), không thay đổi nên không cần dependency
     }, [router]);
+
+
+
 
     const loadPosts = async () => {
         const allPosts = await getAllPosts();
@@ -49,6 +66,10 @@ const Feed = () => {
         setIsModalOpen(true);
     };
 
+    const handlePostClick = (post: Post) => {
+        setSelectedPost(post);
+        setIsEditPost(true);
+    }
 
     return (
         <div className="min-h-screen bg-muted/30">
@@ -77,6 +98,7 @@ const Feed = () => {
                                 <PostCard
                                     key={post.id}
                                     post={post}
+                                    onPostEdit={handlePostClick}
                                     onCommentClick={handleCommentClick}
                                     onPostUpdated={loadPosts}
                                 />
@@ -96,7 +118,12 @@ const Feed = () => {
                 open={isModalOpen}
                 onOpenChange={setIsModalOpen}
             />
-
+            <PostEdit
+                post={selectedPost}
+                open={isEditPost}
+                onPostCreated={loadPosts}
+                onEditChange={(isOpen) => setIsEditPost(isOpen)}
+            />
         </div>
     );
 };

@@ -1,8 +1,8 @@
 "use client"
 
-import { SidebarProvider, SidebarInset, useSidebar } from "@/components/ui/sidebar"
-import DashboardSidebar from "@/components/layout/DashboardSidebar"
-import DashboardHeader from "@/components/layout/DashboardHeader"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import DashboardSidebar from "@/components/admin/DashboardSidebar"
+import DashboardHeader from "@/components/admin/DashboardHeader"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { Toaster as Sonner } from "@/components/ui/sonner"
