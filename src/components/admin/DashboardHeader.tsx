@@ -13,6 +13,7 @@ import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { LogOut, Settings, User } from "lucide-react";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { LogoutButton } from "../auth/LogoutButton";
 
 export default function DashboardHeader() {
     const { state } = useSidebar();
@@ -51,7 +52,7 @@ export default function DashboardHeader() {
                     <DropdownMenuItem><User className="mr-2 h-4 w-4" />Profile</DropdownMenuItem>
                     <DropdownMenuItem><Settings className="mr-2 h-4 w-4" />Settings</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive"><LogOut className="mr-2 h-4 w-4" />Log out</DropdownMenuItem>
+                    <DropdownMenuItem><LogoutButton /></DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </header>

@@ -134,14 +134,14 @@ export default function Posts({ postData }: Props) {
                             <Eye className="h-4 w-4" />
                         </Button>
 
-                        <Button
+                        {/* <Button
                             variant="ghost"
                             size="icon"
                             // onClick={() => flagPost(post.id)}
                             className="cursor-pointer hover:bg-gray-200"
                         >
                             <Flag className="h-4 w-4 text-yellow-500" />
-                        </Button>
+                        </Button> */}
 
                         <Button
                             variant="ghost"
@@ -191,18 +191,18 @@ export default function Posts({ postData }: Props) {
 
             {/* Chi tiết bài viết */}
             <Dialog open={detailDialog.open} onOpenChange={(open) => setDetailDialog({ open, post: null })}>
-                <DialogContent className="rounded-2xl max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="rounded-2xl max-w-xl  ">
                     <DialogHeader>
-                        <DialogTitle>{detailDialog.post?.content}</DialogTitle>
+                        <DialogTitle className="flex items-center">Chi tiết bài viết</DialogTitle>
                         <DialogDescription>
                             Bởi {detailDialog.post?.authorName} •{" "}
                             {detailDialog.post?.createdAt ? formatDateVN(detailDialog.post.createdAt) : ""}
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4">
+                    <div className="space-y-4 overflow-y-auto max-h-[60vh]">
                         <div>
                             <h4 className="font-medium mb-2">Nội dung:</h4>
-                            <p className="text-sm text-muted-foreground">{detailDialog.post?.content}</p>
+                            <p className="text-sm text-muted-foreground whitespace-pre-line">{detailDialog.post?.content}</p>
                         </div>
                         {detailDialog.post?.imageUrls && detailDialog.post.imageUrls.length > 0 && (
                             <div>
@@ -212,7 +212,7 @@ export default function Posts({ postData }: Props) {
                         )}
                     </div>
                     <DialogFooter>
-                        <Button onClick={() => setDetailDialog({ open: false, post: null })}>Đóng</Button>
+                        <Button className="cursor-pointer" onClick={() => setDetailDialog({ open: false, post: null })}>Đóng</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

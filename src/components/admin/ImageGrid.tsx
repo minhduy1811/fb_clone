@@ -32,7 +32,7 @@ export default function ImageGrid({ images }: { images: unknown }) {
 
             {previewImage && (
                 <div
-                    className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center cursor-zoom-out"
+                    className="fixed inset-0 z-100 bg-black/80 flex items-center justify-center cursor-zoom-out"
                     onClick={() => setPreviewImage(null)}
                 >
                     <img

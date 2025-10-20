@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 export default function NotFound() {
     const pathname = usePathname()
@@ -16,9 +17,12 @@ export default function NotFound() {
             <div className="text-center">
                 <h1 className="mb-4 text-4xl font-bold">404</h1>
                 <p className="mb-4 text-xl text-gray-600">Oops! Page not found</p>
-                <Link href="/feed" className="text-blue-500 underline hover:text-blue-700">
-                    Return to Feed
-                </Link>
+                <Button className='hover:bg-blue-500'>
+                    <Link href="/feed" className=" underline text-white">
+                        Return to Feed
+                    </Link>
+                </Button>
+
             </div>
         </div>
     )

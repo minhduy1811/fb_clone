@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuIte
 import { Settings } from 'lucide-react';
 import { LogOut } from 'lucide-react';
 import { Button } from '../ui/button';
+import { LogoutButton } from '../auth/LogoutButton';
 
 export const Header = () => {
     const currentUser = useAuth();
@@ -99,9 +100,8 @@ export const Header = () => {
                                     <span>Settings</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive">
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Log out</span>
+                                <DropdownMenuItem>
+                                    <LogoutButton />
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

@@ -74,7 +74,7 @@ export const PostModal = ({ post, open, onOpenChange }: PostModalProps) => {
 
                     </div>
                     <div className=' overflow-y-auto max-h-[65vh]'>
-                        <p className="text-base white-pre-line mb-2">{post.content}</p>
+                        <p className="text-base whitespace-pre-line mb-2">{post.content}</p>
                         <div
                             className={`grid gap-1 overflow-hidden rounded-lg
                 ${post.imageUrls.length === 1 ? "grid-cols-1" : ""}

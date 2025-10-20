@@ -34,7 +34,7 @@ export const CommentList = ({ comments }: CommentListProps) => {
                                 <p className="font-semibold text-sm text-gray-800">
                                     {comment.userName}
                                 </p>
-                                <p className="text-sm text-gray-900">{comment.content}</p>
+                                <p className="text-sm text-gray-900 whitespace-pre-line">{comment.content}</p>
                             </div>
 
                             <p className="text-xs text-muted-foreground ml-4">
