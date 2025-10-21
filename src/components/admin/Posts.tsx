@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
@@ -13,7 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Eye, Flag, Trash2, AlertTriangle } from "lucide-react";
+import { Eye, Trash2, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from 'sonner'
 import { Post } from "@/types/feed";
@@ -26,14 +26,7 @@ interface Props {
 }
 
 export default function Posts({ postData }: Props) {
-    // ✅ Gán sẵn displayId khi khởi tạo
-    const [posts, setPosts] = useState(() =>
-        postData.map((post, i) => ({
-            ...post,
-            displayId: `P${String(i + 1).padStart(4, "0")}`,
-        }))
-    );
-
+    const [posts, setPosts] = useState<Post[]>([]);
     const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; post: Post | null }>({
         open: false,
         post: null,
@@ -44,25 +37,23 @@ export default function Posts({ postData }: Props) {
     });
 
     const [search, setSearch] = useState("");
-
-    // const flagPost = (postId: string) => {
-    //     toast.warning("Đã gắn nhãn vi phạm", {
-    //         description: "Bài viết đã được gắn nhãn vi phạm quy định.",
-    //     });
-    // };
+    useEffect(() => {
+        if (postData && postData.length > 0) {
+            setPosts(
+                postData.map((post, i) => ({
+                    ...post,
+                    displayId: `P${String(i + 1).padStart(4, "0")}`,
+                }))
+            );
+        }
+    }, [postData]);
 
     const handleDelete = async (id: string) => {
         try {
             if (deleteDialog.post) {
                 await deleteAdminPost(id);
-                // ✅ Xoá bài và cập nhật lại index
                 setPosts((prev) =>
-                    prev
-                        .filter((post) => post.id !== id)
-                        .map((post, i) => ({
-                            ...post,
-                            displayId: `P${String(i + 1).padStart(4, "0")}`,
-                        }))
+                    prev.filter((post) => post.id !== id)
                 );
 
                 toast.success("Bài viết đã được xóa", {
@@ -77,11 +68,9 @@ export default function Posts({ postData }: Props) {
             setDeleteDialog({ open: false, post: null });
         }
     };
-
-    // ✅ Cột hiển thị
     const columns: ColumnDef<Post>[] = [
         {
-            accessorKey: "displayId",
+            accessorKey: "id",
             header: "Mã bài viết",
         },
         {

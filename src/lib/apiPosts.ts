@@ -32,12 +32,9 @@ export const createPost = async (postData: { content: string; imageUrls?: string
 export const getAllPosts = async (): Promise<Post[]> => {
     const user = auth.currentUser;
     if (!user) { throw new Error("User not logged in"); }
-
-    // 🔍 Lấy role từ Firestore
     const userDoc = await getDoc(doc(db, "users", user.uid));
     const role = userDoc.exists() ? userDoc.data()?.role || "user" : "user";
 
-    // 🧠 Endpoint phân nhánh theo role
     const endpoint = role === "admin" ? "/admin/posts" : "/posts";
 
     const res = await api.get(endpoint, { withCredentials: true });

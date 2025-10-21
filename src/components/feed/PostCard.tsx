@@ -23,8 +23,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { formatRelativeTime } from "@/lib/time"
 import { MoreHorizontal } from 'lucide-react';
 
-
-
 interface PostCardProps {
     post: Post;
     onCommentClick: (post: Post) => void;
@@ -37,27 +35,14 @@ export const PostCard = ({ post, onCommentClick, onPostEdit, onPostUpdated }: Po
     const { user } = useAuth();
 
     const isOwner = user?.uid === post.authorId;
-
-    // const handleUpdate = async (id: string) => {
-    //     if (!editContent.trim()) {
-    //         toast.error('Lỗi', { description: 'Nội dung không được để trống' });
-    //         return;
-    //     }
-    //     await updatePost(id, editContent);
-    //     setIsEditing(false);
-    //     onPostUpdated();
-    //     toast.success('Thành công', { description: 'Đã cập nhật bài viết' });
-    // };
-
     const handleDelete = async (id: string) => {
         try {
-            await deletePost(id); // gọi API xóa
+            await deletePost(id);
             onPostUpdated?.();
             toast.success("Thành công", {
                 description: "Bài viết đã được xóa.",
             });
-            setShowDeleteDialog(false); // đóng dialog
-            // gọi callback reload danh sách nếu có
+            setShowDeleteDialog(false);
         } catch (error) {
             console.error(error);
             toast.error("Lỗi khi xóa bài viết", {
@@ -94,7 +79,7 @@ export const PostCard = ({ post, onCommentClick, onPostEdit, onPostUpdated }: Po
                     {isOwner && (
                         <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
+                                <Button variant="ghost" size="icon" className='cursor-pointer hover:rounded-2xl'>
                                     <MoreHorizontal className="w-4 h-4" />
                                 </Button>
                             </DropdownMenuTrigger>

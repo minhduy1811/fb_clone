@@ -67,13 +67,11 @@ export default function LoginForm({ defaultEmail }: LoginFormProps) {
 
             const { role = 'user ' } = userDoc.data();
             const idToken = await user.getIdToken();
-
-            // ✅ Lưu cookie cho SSR
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ idToken }),
-                credentials: "include", // ✅ để browser lưu cookie
+                credentials: "include", // 
             });
             if (!res.ok) {
                 const body = await res.json().catch(() => ({}));
@@ -82,8 +80,6 @@ export default function LoginForm({ defaultEmail }: LoginFormProps) {
                 return;
             }
             toast.success("Đăng nhập thành công!");
-
-            // 🔐 Điều hướng theo role
             router.push(role === 'admin' ? '/admin' : '/feed');
         } catch (error: any) {
             console.error("🔥 Firebase login error:", error);

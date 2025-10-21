@@ -33,7 +33,6 @@ const Feed = () => {
                 router.replace("/auth/login");
                 return;
             }
-
             try {
                 await loadPosts();
             } catch (err: any) {
@@ -50,11 +49,7 @@ const Feed = () => {
             isMounted = false;
             unsubscribe();
         };
-        // ⚠️ auth là singleton (import cố định), không thay đổi nên không cần dependency
     }, [router]);
-
-
-
 
     const loadPosts = async () => {
         const allPosts = await getAllPosts();
@@ -73,11 +68,7 @@ const Feed = () => {
 
     return (
         <div className="min-h-screen bg-muted/30">
-
             <Header />
-
-
-
             <div className="relative">
                 <div className=''>
                     <LeftSidebar />

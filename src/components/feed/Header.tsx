@@ -31,7 +31,7 @@ export const Header = () => {
                 </div>
 
                 {/* Center Icons */}
-                <div className="flex flex-1 items-center justify-center md:gap-15 md:mr-30   gap-8">
+                <div className="flex flex-1 items-center justify-center md:gap-15 md:mr-30 gap-8">
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>

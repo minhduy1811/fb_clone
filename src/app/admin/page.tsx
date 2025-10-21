@@ -1,38 +1,33 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Dashboard from "@/components/admin/Dashboard";
 
-export default async function Page() {
-    // 🔹 Đọc cookie session từ trình duyệt
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get("session")?.value;
+export default function Page() {
+    const router = useRouter();
 
-    if (!sessionCookie) {
-        console.warn("❌ Không tìm thấy cookie session — redirect tới /auth/login");
-        redirect("/auth/login");
-    }
+    useEffect(() => {
+        const checkAdmin = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/check`, {
+                    credentials: "include",
+                });
 
-    // 🔹 Gửi cookie này sang NestJS backend
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/posts`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Cookie": `session=${sessionCookie}`,
-        },
-        cache: "no-store",
-    });
+                if (!res.ok) {
+                    console.warn("❌ Không hợp lệ — redirect /auth/login");
+                    router.push("/auth/login");
+                    return;
+                }
+            } catch (err) {
+                console.error("Lỗi fetch:", err);
+                router.push("/auth/login");
+            }
+        };
 
-    // 🔹 Kiểm tra phản hồi từ backend
-    if (res.status === 401 || res.status === 403) {
-        console.warn("❌ Backend trả 401/403 — redirect /auth/login");
-        redirect("/auth/login");
-    }
+        checkAdmin();
+    }, [router]);
 
-    if (!res.ok) {
-        console.error("Fetch failed:", res.status, await res.text());
-        redirect("/auth/login");
-    }
 
-    const postData = await res.json();
     return <Dashboard />;
 }

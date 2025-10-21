@@ -1,38 +1,53 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Posts from "@/components/admin/Posts";
+import { Post } from "@/types/feed"
+import { getAllPosts } from "@/lib/apiPosts";
 
-export default async function Page() {
-    // 🔹 Đọc cookie session từ trình duyệt
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get("session")?.value;
+export default function Page() {
+    const [posts, setPosts] = useState<Post[]>([]);
+    const router = useRouter();
+    // useEffect(() => {
+    //     const checkSession = async () => {
+    //         try {
+    //             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/posts`, {
+    //                 method: "GET",
+    //                 headers: { "Content-Type": "application/json" },
+    //                 credentials: "include",
+    //             });
+    //             if (!res.ok) {
+    //                 const errorText = await res.text();
+    //                 console.error("Lỗi response:", errorText);
+    //                 router.push("/auth/login");
+    //                 return;
+    //             }
+    //             const data = await res.json();
+    //             setPosts(data);
+    //             console.log("✅ Session hợp lệ!");
+    //             console.log("Dữ liệu bài viết:", data);
+    //         } catch (err) {
+    //             console.error("Lỗi fetch:", err);
+    //             router.push("/auth/login");
+    //         }
+    //     };
 
-    if (!sessionCookie) {
-        console.warn("❌ Không tìm thấy cookie session — redirect tới /auth/login");
-        redirect("/auth/login");
-    }
+    //     checkSession();
+    // }, [router]);
+    useEffect(() => {
+        const checkSession = async () => {
+            try {
+                const allPosts = await getAllPosts();
+                setPosts(allPosts);
+                console.log("📦 Dữ liệu bài viết:", allPosts);
+            } catch (error) {
+                console.error("❌ Lỗi khi tải bài viết:", error);
+                router.push("/auth/login");
+            }
+        };
 
-    // 🔹 Gửi cookie này sang NestJS backend
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/posts`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Cookie": `session=${sessionCookie}`,
-        },
-        cache: "no-store",
-    });
-
-    // 🔹 Kiểm tra phản hồi từ backend
-    if (res.status === 401 || res.status === 403) {
-        console.warn("❌ Backend trả 401/403 — redirect /auth/login");
-        redirect("/auth/login");
-    }
-
-    if (!res.ok) {
-        console.error("Fetch failed:", res.status, await res.text());
-        redirect("/auth/login");
-    }
-
-    const postData = await res.json();
-    return <Posts postData={postData} />;
+        checkSession();
+    }, [router]);
+    return <Posts postData={posts} />;
 }
