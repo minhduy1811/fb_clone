@@ -28,3 +28,6 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_FB_META_80EF3 }}
           channelId: live
           projectId: fb-meta-80ef3
+        
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
