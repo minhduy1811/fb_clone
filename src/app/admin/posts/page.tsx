@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Posts from "@/components/admin/Posts";
 import { Post } from "@/types/feed"
 import { getAllPosts } from "@/lib/apiPosts";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase.config";
 
 export default function Page() {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -36,18 +38,22 @@ export default function Page() {
     //     checkSession();
     // }, [router]);
     useEffect(() => {
-        const checkSession = async () => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                router.push("/auth/login");
+                return;
+            }
+
             try {
                 const allPosts = await getAllPosts();
                 setPosts(allPosts);
-                console.log("📦 Dữ liệu bài viết:", allPosts);
             } catch (error) {
                 console.error("❌ Lỗi khi tải bài viết:", error);
                 router.push("/auth/login");
             }
-        };
+        });
 
-        checkSession();
+        return () => unsubscribe();
     }, [router]);
     return <Posts postData={posts} />;
 }

@@ -6,17 +6,7 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
-    withCredentials: true, // gửi cookie cùng với yêu cầu
+    withCredentials: true,
 });
-// api.interceptors.response.use(
-//     (res) => res,
-//     async (error) => {
-//         if (error.response?.status === 401) {
-//             await fetch("/api/refresh", { method: "POST" });
-//             return api.request(error.config);
-//         }
-//         return Promise.reject(error);
-//     }
-// );
 
 export default api;
